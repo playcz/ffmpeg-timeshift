@@ -44,7 +44,7 @@ run_ffmpeg_hls () {
     -segment_time "${SEG_SECONDS}" \
     -strftime 1 \
     -reset_timestamps 1 \
-    "${TMP_HLS}/%Y%m%d%H%M.ts"
+    "${TMP_HLS}/%H%M.ts"
 }
 
 # DASH segments: UTC minute key filenames, MP4 audio per minute
@@ -63,7 +63,7 @@ run_ffmpeg_dash () {
     -reset_timestamps 1 \
     -segment_format mp4 \
     -movflags +faststart \
-    "${TMP_DASH}/%Y%m%d%H%M.mp4"
+    "${TMP_DASH}/%H%M.mp4"
 }
 
 # Monitor for completed segments and atomically move them

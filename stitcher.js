@@ -27,18 +27,24 @@ function pad2(n) {
 }
 
 function utcMinuteKey(d) {
-  return `${d.getUTCFullYear()}${pad2(d.getUTCMonth() + 1)}${pad2(
-    d.getUTCDate()
-  )}${pad2(d.getUTCHours())}${pad2(d.getUTCMinutes())}`;
+  return `${pad2(d.getUTCHours())}${pad2(d.getUTCMinutes())}`;
 }
 
 function keyToDateUTC(key) {
-  const y = parseInt(key.slice(0, 4), 10);
-  const mo = parseInt(key.slice(4, 6), 10) - 1;
-  const da = parseInt(key.slice(6, 8), 10);
-  const hh = parseInt(key.slice(8, 10), 10);
-  const mm = parseInt(key.slice(10, 12), 10);
-  return new Date(Date.UTC(y, mo, da, hh, mm, 0));
+  // Key is now HHMM format, reconstruct date from current UTC date
+  const now = new Date();
+  const hh = parseInt(key.slice(0, 2), 10);
+  const mm = parseInt(key.slice(2, 4), 10);
+  return new Date(
+    Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      hh,
+      mm,
+      0
+    )
+  );
 }
 
 function run(cmd, args) {
