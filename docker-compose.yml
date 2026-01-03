@@ -2,7 +2,12 @@ version: "3.8"
 
 services:
   timeshift:
+    # To build locally, uncomment the line below and comment out the 'image' line
     build: .
+
+    # Use pre-built image from GitHub Container Registry
+    # Replace 'username/repo' with your actual GitHub username and repository name
+    # image: ghcr.io/playcz/ffmpeg-timeshift:latest
     container_name: timeshift
     environment:
       STREAM_ID: "brno"
