@@ -42,6 +42,7 @@ run_ffmpeg_hls () {
     -c:a aac -b:a "${AAC_BITRATE}" -ar "${AUDIO_SR}" -ac "${AUDIO_CH}" \
     -f segment \
     -segment_time "${SEG_SECONDS}" \
+    -segment_atclocktime 1 \
     -strftime 1 \
     -reset_timestamps 1 \
     "${TMP_HLS}/%H%M.ts"
@@ -59,6 +60,7 @@ run_ffmpeg_dash () {
     -c:a aac -b:a "${AAC_BITRATE}" -ar "${AUDIO_SR}" -ac "${AUDIO_CH}" \
     -f segment \
     -segment_time "${SEG_SECONDS}" \
+    -segment_atclocktime 1 \
     -strftime 1 \
     -reset_timestamps 1 \
     -segment_format mp4 \
