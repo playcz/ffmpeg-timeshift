@@ -19,7 +19,7 @@ const STITCH_INTERVAL_SEC = parseInt(
 );
 
 const WINDOW_MINUTES = HISTORY_HOURS * 60; // 720 for 12h
-const SAFE_MARGIN_MINUTES = 0; // keep 0 minute margin for segment completion
+const SAFE_MARGIN_MINUTES = 1; // keep 1 minute margin for segment completion
 const MIN_OK_SECONDS = SEG_SECONDS - 2; // accept "few seconds" loss, but ensure near-complete
 
 function pad2(n) {
