@@ -1,35 +1,31 @@
-services:
-  ffmpeg:
-    image: lscr.io/linuxserver/ffmpeg:latest
-    environment:
-      ICECAST_URL: "https://icecast-u3.play.cz/cro1-128.mp3"
-    entrypoint: ["/bin/sh", "/app/run-ffmpeg.sh"]
-    volumes:
-      - /Users/ladasoukup/.tmpdisk/tmp/cro:/output
-      - ./run-ffmpeg.sh:/app/run-ffmpeg.sh:ro
-    restart: unless-stopped
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "test -f /output/dash/manifest.mpd && test -f /output/hls/playlist.m3u8 && now=$(date +%s) && mod_dash=$(stat -c %Y /output/dash/manifest.mpd 2>/dev/null || stat -f %m /output/dash/manifest.mpd) && mod_hls=$(stat -c %Y /output/hls/playlist.m3u8 2>/dev/null || stat -f %m /output/hls/playlist.m3u8) && [ $((now - mod_dash)) -lt 180 ] && [ $((now - mod_hls)) -lt 180 ]",
-        ]
-      interval: 1m
-      timeout: 10s
-      retries: 3
-      start_period: 2m
+version: "3.8"
 
-  nginx:
-    image: nginx:latest
+services:
+  timeshift:
+    build: .
+    container_name: timeshift
+    environment:
+      STREAM_ID: "brno"
+      ICECAST_URL: "https://rozhlas.stream/brno_high.aac"
+
+      # Audio settings
+      AUDIO_SR: "48000"
+      AUDIO_CH: "2"
+      AAC_BITRATE: "64k"
+
+      # Timeshift settings
+      SEG_SECONDS: "60"
+      HISTORY_HOURS: "12"
+      UTC_MODE: "1"
+
+      # Update interval for manifest regeneration
+      STITCH_INTERVAL_SEC: "10"
     volumes:
-      - /Users/ladasoukup/.tmpdisk/tmp/cro:/usr/share/nginx/html:ro
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-    ports:
-      - "8080:80"
+      - ./test:/out
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/heartbeat.txt"]
+      test: ["CMD-SHELL", "/app/healthcheck.sh"]
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 10s
+      start_period: 30s
