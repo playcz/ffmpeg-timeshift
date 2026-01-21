@@ -1,14 +1,10 @@
-version: "3.8"
-
 services:
   timeshift:
     # To build locally, uncomment the line below and comment out the 'image' line
     build: .
-
-    # Use pre-built image from GitHub Container Registry
-    # Replace 'username/repo' with your actual GitHub username and repository name
-    # image: ghcr.io/playcz/ffmpeg-timeshift:latest
     container_name: timeshift
+    # Use pre-built image from GitHub Container Registry
+    # image: ghcr.io/playcz/ffmpeg-timeshift:main
     environment:
       STREAM_ID: "brno"
       ICECAST_URL: "https://rozhlas.stream/brno_high.aac"
@@ -20,17 +16,17 @@ services:
 
       # Timeshift settings
       SEG_SECONDS: "60"
-      HISTORY_HOURS: "12"
+      HISTORY_HOURS: "1"
       UTC_MODE: "1"
 
       # Update interval for manifest regeneration
       STITCH_INTERVAL_SEC: "10"
     volumes:
-      - ./test:/out
+      - /Users/ladasoukup/.tmpdisk/tmp:/out
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "/app/healthcheck.sh"]
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 30s
+      start_period: 300s

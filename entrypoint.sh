@@ -35,17 +35,19 @@ LS_PID=$!
 # Write to temp directory, renamer will move when complete
 run_ffmpeg_hls () {
   echo "[timeshift] Starting ffmpeg (HLS segment writer)..."
+  cd "${TMP_HLS}"
   ffmpeg -hide_banner -loglevel info \
     -fflags +genpts \
     -thread_queue_size 1024 \
     -i /tmp/hls.wav \
     -c:a aac -b:a "${AAC_BITRATE}" -ar "${AUDIO_SR}" -ac "${AUDIO_CH}" \
-    -f segment \
-    -segment_time "${SEG_SECONDS}" \
+    -f hls \
+    -hls_time "${SEG_SECONDS}" \
     -segment_atclocktime 1 \
     -strftime 1 \
-    -reset_timestamps 1 \
-    "${TMP_HLS}/%H%M.ts"
+    -hls_segment_filename "%H%M.ts" \
+    -hls_flags program_date_time+append_list \
+    playlist.m3u8
 }
 
 # DASH segments: UTC minute key filenames, MP4 audio per minute
@@ -53,6 +55,7 @@ run_ffmpeg_hls () {
 # Write to temp directory, renamer will move when complete
 run_ffmpeg_dash () {
   echo "[timeshift] Starting ffmpeg (DASH segment writer - MP4 per minute)..."
+  cd "${TMP_DASH}"
   ffmpeg -hide_banner -loglevel info \
     -fflags +genpts \
     -thread_queue_size 1024 \
@@ -64,23 +67,23 @@ run_ffmpeg_dash () {
     -strftime 1 \
     -reset_timestamps 1 \
     -segment_format mp4 \
-    -movflags +faststart \
-    "${TMP_DASH}/%H%M.mp4"
+    -movflags +frag_keyframe+empty_moov+default_base_moof \
+    "%H%M.mp4"
 }
 
 # Monitor for completed segments and atomically move them
 rename_completed_segments () {
   echo "[timeshift] Starting segment renamer..."
   while true; do
-    # Find files in temp dirs that haven't been modified in 3 seconds (complete)
-    find "${TMP_HLS}" -name "*.ts" -type f -mmin +0.05 2>/dev/null | while read -r file; do
+    # Find files in temp dirs that haven't been modified in 5 seconds (complete)
+    find "${TMP_HLS}" -name "*.ts" -type f -mmin +0.083 2>/dev/null | while read -r file; do
       target="${OUT_HLS}/$(basename "$file")"
       if [ -f "$file" ]; then
         mv "$file" "$target" 2>/dev/null && echo "[renamer] HLS: $(basename "$target")"
       fi
     done
     
-    find "${TMP_DASH}" -name "*.mp4" -type f -mmin +0.05 2>/dev/null | while read -r file; do
+    find "${TMP_DASH}" -name "*.mp4" -type f -mmin +0.083 2>/dev/null | while read -r file; do
       target="${OUT_DASH}/$(basename "$file")"
       if [ -f "$file" ]; then
         mv "$file" "$target" 2>/dev/null && echo "[renamer] DASH: $(basename "$target")"

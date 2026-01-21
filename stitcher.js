@@ -15,11 +15,11 @@ const SEG_SECONDS = parseInt(process.env.SEG_SECONDS || "60", 10);
 const HISTORY_HOURS = parseInt(process.env.HISTORY_HOURS || "12", 10);
 const STITCH_INTERVAL_SEC = parseInt(
   process.env.STITCH_INTERVAL_SEC || "10",
-  10
+  10,
 );
 
 const WINDOW_MINUTES = HISTORY_HOURS * 60; // 720 for 12h
-const SAFE_MARGIN_MINUTES = 1; // keep 1 minute margin for segment completion
+const SAFE_MARGIN_MINUTES = 1; // keep 1 minute margin for segment completion (1min for segment to write + 1min buffer)
 const MIN_OK_SECONDS = SEG_SECONDS - 2; // accept "few seconds" loss, but ensure near-complete
 
 function pad2(n) {
@@ -42,8 +42,8 @@ function keyToDateUTC(key) {
       now.getUTCDate(),
       hh,
       mm,
-      0
-    )
+      0,
+    ),
   );
 }
 
@@ -73,7 +73,7 @@ function ffprobeDurationSeconds(filePath) {
         "default=noprint_wrappers=1:nokey=1",
         filePath,
       ],
-      { stdio: ["ignore", "pipe", "pipe"] }
+      { stdio: ["ignore", "pipe", "pipe"] },
     )
       .toString()
       .trim();
@@ -150,7 +150,7 @@ function ensureMinuteFiles(minuteKey) {
     const stats = fs.statSync(tsPath);
     if (stats.size === 0) {
       console.warn(
-        `[stitcher] TS is zero bytes, replacing with silence: ${minuteKey}`
+        `[stitcher] TS is zero bytes, replacing with silence: ${minuteKey}`,
       );
       try {
         fs.unlinkSync(tsPath);
@@ -162,7 +162,7 @@ function ensureMinuteFiles(minuteKey) {
       const dur = ffprobeDurationSeconds(tsPath);
       if (dur !== null && dur < MIN_OK_SECONDS) {
         console.warn(
-          `[stitcher] TS too short (${dur}s), replacing with silence: ${minuteKey}`
+          `[stitcher] TS too short (${dur}s), replacing with silence: ${minuteKey}`,
         );
         try {
           fs.unlinkSync(tsPath);
@@ -175,21 +175,21 @@ function ensureMinuteFiles(minuteKey) {
     const stats = fs.statSync(mp4Path);
     if (stats.size === 0) {
       console.warn(
-        `[stitcher] MP4 is zero bytes, replacing with silence: ${minuteKey}`
+        `[stitcher] MP4 is zero bytes, replacing with silence: ${minuteKey}`,
       );
       try {
         fs.unlinkSync(mp4Path);
         needMp4Recreate = true;
       } catch (e) {
         console.error(
-          `[stitcher] Failed to delete zero-byte MP4: ${e.message}`
+          `[stitcher] Failed to delete zero-byte MP4: ${e.message}`,
         );
       }
     } else {
       const dur = ffprobeDurationSeconds(mp4Path);
       if (dur !== null && dur < MIN_OK_SECONDS) {
         console.warn(
-          `[stitcher] MP4 too short (${dur}s), replacing with silence: ${minuteKey}`
+          `[stitcher] MP4 too short (${dur}s), replacing with silence: ${minuteKey}`,
         );
         try {
           fs.unlinkSync(mp4Path);
@@ -203,7 +203,7 @@ function ensureMinuteFiles(minuteKey) {
     console.warn(
       `[stitcher] ${
         needTsRecreate ? "Recreating" : "Missing"
-      } TS, creating silence: ${minuteKey}`
+      } TS, creating silence: ${minuteKey}`,
     );
     ensureSilenceTs(tsPath);
   }
@@ -211,7 +211,7 @@ function ensureMinuteFiles(minuteKey) {
     console.warn(
       `[stitcher] ${
         needMp4Recreate ? "Recreating" : "Missing"
-      } MP4, creating silence: ${minuteKey}`
+      } MP4, creating silence: ${minuteKey}`,
     );
     ensureSilenceMp4(mp4Path);
   }
@@ -351,7 +351,7 @@ function tick() {
     // Touch a heartbeat file for healthchecks if you want
     fs.writeFileSync(
       path.join(OUT_BASE, "stitcher_heartbeat.txt"),
-      new Date().toISOString() + "\n"
+      new Date().toISOString() + "\n",
     );
   } catch (e) {
     console.error("[stitcher] tick error:", e);
@@ -359,7 +359,7 @@ function tick() {
 }
 
 console.log(
-  `[stitcher] starting for ${STREAM_ID}, window=${WINDOW_MINUTES} minutes, seg=${SEG_SECONDS}s, UTC`
+  `[stitcher] starting for ${STREAM_ID}, window=${WINDOW_MINUTES} minutes, seg=${SEG_SECONDS}s, UTC`,
 );
 tick();
 setInterval(tick, STITCH_INTERVAL_SEC * 1000);
