@@ -1,0 +1,30 @@
+services:
+  transcoder:
+    build: .
+    container_name: transcoder
+    restart: unless-stopped
+
+    environment:
+      STREAM_ID: "radiozurnal"
+      ICECAST_URL: "https://rozhlas.stream/radiozurnal_high.aac"
+      UDP_PORT: "40000"
+
+      # 12h = 43200 seconds
+      TIME_SHIFT_BUFFER_DEPTH: "43200"
+      SEGMENT_DURATION: "60"
+
+      # audio encoding
+      AUDIO_BITRATE: "64k"
+      AUDIO_SAMPLE_RATE: "48000"
+      AUDIO_CHANNELS: "2"
+
+    volumes:
+      # This is the folder nginx should serve from (bind or named volume)
+      - /Users/ladasoukup/.tmpdisk/tmp:/output
+
+    # optional: keep logs reasonable
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "3"
