@@ -7,8 +7,8 @@ services:
     environment:
       STREAM_ID: "radiozurnal"
       ICECAST_URL: "https://rozhlas.stream/radiozurnal_high.aac"
-      SEGMENT_DURATION: "60"
-      TIME_SHIFT_BUFFER_DEPTH: "43200"
+      SEGMENT_DURATION: "5"
+      TIME_SHIFT_BUFFER_DEPTH: "300"
       AUDIO_BITRATE: "64k"
       AUDIO_CHANNELS: "2"
       HTTP_PORT: "18080"
@@ -22,8 +22,8 @@ services:
     restart: unless-stopped
     environment:
       STREAM_ID: "radiozurnal"
-      SEGMENT_DURATION: "60"
-      TIME_SHIFT_BUFFER_DEPTH: "43200"
+      SEGMENT_DURATION: "5"
+      TIME_SHIFT_BUFFER_DEPTH: "300"
       STITCH_INTERVAL_SECONDS: "2"
     volumes:
       - /Users/ladasoukup/.tmpdisk/tmp:/output
