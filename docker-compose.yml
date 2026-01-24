@@ -27,7 +27,7 @@ services:
       <<: *transcoder-env
       STREAM_ID: "radiozurnal"
       ICECAST_URL: "https://rozhlas.stream/radiozurnal_high.aac"
-      UDP_PORT: "40000"
+      UDP_PORT: "40001"
 
   # Example additional stream instance
   # transcoder-other:
@@ -37,4 +37,4 @@ services:
   #     <<: *transcoder-env
   #     STREAM_ID: "other"
   #     ICECAST_URL: "https://example.invalid/other-stream.aac"
-  #     UDP_PORT: "40001"
+  #     UDP_PORT: "40002"
