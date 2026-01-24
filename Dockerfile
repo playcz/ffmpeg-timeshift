@@ -1,7 +1,7 @@
 FROM debian:bookworm-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates curl bash tini \
+  ca-certificates curl bash tini python3 python3-venv \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
@@ -15,7 +15,7 @@ RUN mkdir -p /opt/shaka && \
     ln -s /opt/shaka/packager /usr/local/bin/packager
 
 WORKDIR /app
-COPY entrypoint.sh /app/entrypoint.sh
+COPY entrypoint.sh stitcher.py cleaner.py /app/
 RUN chmod +x /app/entrypoint.sh
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
