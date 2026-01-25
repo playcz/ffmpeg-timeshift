@@ -395,7 +395,7 @@ def main() -> None:
             assign_sequences(state, segments)
             write_playlist(state, segments)
             build_mpd(segments)
-            log(f"stitched {len(segments)} segments")
+            # log(f"stitched {len(segments)} segments")
         except Exception as exc:  # noqa: BLE001
             log(f"error: {exc}")
         time.sleep(max(1, POLL_INTERVAL))
